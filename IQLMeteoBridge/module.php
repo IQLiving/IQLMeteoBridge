@@ -15,7 +15,24 @@ class IQLMeteoBridge extends IPSModule {
         parent::ApplyChanges();
 
         $this->RegisterProfileInteger("Solar.IQLMB","",""," W/qm",0,0,1);
-
+        $this->RegisterProfileIntegerEx("WindDirText.IQLMB", "", "", "", Array(
+            Array(0, "N", "", -1),
+            Array(23, "NNO",  "",-1),
+            Array(45, "NO",  "",-1),
+            Array(68, "ONO",  "",-1),
+            Array(90, "O",  "",-1),
+            Array(113, "OSO",  "",-1),
+            Array(135, "SO",  "",-1),
+            Array(158, "SSO",  "",-1),
+            Array(180, "S",  "",-1),
+            Array(203, "SSW",  "",-1),
+            Array(225, "SW",  "",-1),
+            Array(248, "WSW",  "",-1),
+            Array(270, "W",  "",-1),
+            Array(293, "WNW",  "",-1),
+            Array(315, "NW",  "",-1),
+            Array(338, "NNW",  "",-1)
+        ));
         if($this->ReadPropertyString("sensortype") == "THB") {
             $this->RegisterVariableString("ID","SensorID","~String",0);
             $this->RegisterVariableFloat("TEMPERATURE","Temperatur","~Temperature",0);
@@ -42,7 +59,7 @@ class IQLMeteoBridge extends IPSModule {
         }
         elseif($this->ReadPropertyString("sensortype") == "WIND") {
             $this->RegisterVariableString("ID","SensorID","~String",0);
-            $this->RegisterVariableInteger("DIRECTION","Windrichtung","~WindDirection",0);
+            $this->RegisterVariableInteger("DIRECTION","Windrichtung","WindDirText.IQLMB",0);
             $this->RegisterVariableFloat("GUST","Windgeschwindigkeit", "~WindSpeed.ms",0);
             $this->RegisterVariableFloat("WIND","Durchschnittswindgeschwindigkeit", "~WindSpeed.ms",0);
             $this->RegisterVariableFloat("GUSTKM","Windgeschwindigkeit","~WindSpeed.kmh",0);
@@ -60,55 +77,67 @@ class IQLMeteoBridge extends IPSModule {
     public function ReceiveData($JSONString) {
         $data = json_decode($JSONString);
         if($this->ReadPropertyString("sensortype") == "THB") {
-            $sensortype = $this->ReadPropertyString("sensortype");
-            $sensorid = (string) "thb" .$this->ReadPropertyInteger("sensorid");
-            SetValue($this->GetIDForIdent("ID"),$data->Buffer->$sensortype->$sensorid->id);
-            SetValue($this->GetIDForIdent("TEMPERATURE"),$data->Buffer->$sensortype->$sensorid->temp);
-            SetValue($this->GetIDForIdent("HUMIDITY"),$data->Buffer->$sensortype->$sensorid->hum);
-            SetValue($this->GetIDForIdent("DEWPOINT"),$data->Buffer->$sensortype->$sensorid->dew);
-            SetValue($this->GetIDForIdent("PRESS"),$data->Buffer->$sensortype->$sensorid->press);
-            SetValue($this->GetIDForIdent("SEAPRESS"),$data->Buffer->$sensortype->$sensorid->seapress);
+            if(array_key_exists("THB",$data->Buffer)) {
+                $sensortype = $this->ReadPropertyString("sensortype");
+                $sensorid = (string)"thb" . $this->ReadPropertyInteger("sensorid");
+                SetValue($this->GetIDForIdent("ID"), $data->Buffer->$sensortype->$sensorid->id);
+                SetValue($this->GetIDForIdent("TEMPERATURE"), $data->Buffer->$sensortype->$sensorid->temp);
+                SetValue($this->GetIDForIdent("HUMIDITY"), $data->Buffer->$sensortype->$sensorid->hum);
+                SetValue($this->GetIDForIdent("DEWPOINT"), $data->Buffer->$sensortype->$sensorid->dew);
+                SetValue($this->GetIDForIdent("PRESS"), $data->Buffer->$sensortype->$sensorid->press);
+                SetValue($this->GetIDForIdent("SEAPRESS"), $data->Buffer->$sensortype->$sensorid->seapress);
+            }
         }
         elseif($this->ReadPropertyString("sensortype") == "RAIN") {
-            $sensortype = $this->ReadPropertyString("sensortype");
-            $sensorid = (string) "rain" .$this->ReadPropertyInteger("sensorid");
-            SetValue($this->GetIDForIdent("ID"),$data->Buffer->$sensortype->$sensorid->id);
-            SetValue($this->GetIDForIdent("RAIN"),$data->Buffer->$sensortype->$sensorid->rate);
-            SetValue($this->GetIDForIdent("TOTAL"),$data->Buffer->$sensortype->$sensorid->total);
-            SetValue($this->GetIDForIdent("DELTA"),$data->Buffer->$sensortype->$sensorid->delta);
+            if(array_key_exists("RAIN",$data->Buffer)) {
+                $sensortype = $this->ReadPropertyString("sensortype");
+                $sensorid = (string)"rain" . $this->ReadPropertyInteger("sensorid");
+                SetValue($this->GetIDForIdent("ID"), $data->Buffer->$sensortype->$sensorid->id);
+                SetValue($this->GetIDForIdent("RAIN"), $data->Buffer->$sensortype->$sensorid->rate);
+                SetValue($this->GetIDForIdent("TOTAL"), $data->Buffer->$sensortype->$sensorid->total);
+                SetValue($this->GetIDForIdent("DELTA"), $data->Buffer->$sensortype->$sensorid->delta);
+            }
         }
         elseif($this->ReadPropertyString("sensortype") == "UV") {
-            $sensortype = $this->ReadPropertyString("sensortype");
-            $sensorid = (string) "uv" .$this->ReadPropertyInteger("sensorid");
-            SetValue($this->GetIDForIdent("ID"),$data->Buffer->$sensortype->$sensorid->id);
-            SetValue($this->GetIDForIdent("INDEX"),$data->Buffer->$sensortype->$sensorid->index);
+            if(array_key_exists("UV",$data->Buffer)) {
+                $sensortype = $this->ReadPropertyString("sensortype");
+                $sensorid = (string)"uv" . $this->ReadPropertyInteger("sensorid");
+                SetValue($this->GetIDForIdent("ID"), $data->Buffer->$sensortype->$sensorid->id);
+                SetValue($this->GetIDForIdent("INDEX"), $data->Buffer->$sensortype->$sensorid->index);
+            }
         }
         elseif($this->ReadPropertyString("sensortype") == "TH") {
-            $sensortype = $this->ReadPropertyString("sensortype");
-            $sensorid = (string) "th" .$this->ReadPropertyInteger("sensorid");
-            SetValue($this->GetIDForIdent("ID"),$data->Buffer->$sensortype->$sensorid->id);
-            SetValue($this->GetIDForIdent("TEMPERATURE"),$data->Buffer->$sensortype->$sensorid->temp);
-            SetValue($this->GetIDForIdent("HUMIDITY"),$data->Buffer->$sensortype->$sensorid->hum);
-            SetValue($this->GetIDForIdent("DEWPOINT"),$data->Buffer->$sensortype->$sensorid->dew);
+            if(array_key_exists("TH",$data->Buffer)) {
+                $sensortype = $this->ReadPropertyString("sensortype");
+                $sensorid = (string)"th" . $this->ReadPropertyInteger("sensorid");
+                SetValue($this->GetIDForIdent("ID"), $data->Buffer->$sensortype->$sensorid->id);
+                SetValue($this->GetIDForIdent("TEMPERATURE"), $data->Buffer->$sensortype->$sensorid->temp);
+                SetValue($this->GetIDForIdent("HUMIDITY"), $data->Buffer->$sensortype->$sensorid->hum);
+                SetValue($this->GetIDForIdent("DEWPOINT"), $data->Buffer->$sensortype->$sensorid->dew);
+            }
         }
         elseif($this->ReadPropertyString("sensortype") == "WIND") {
-            $sensortype = $this->ReadPropertyString("sensortype");
-            $sensorid = (string) "wind" .$this->ReadPropertyInteger("sensorid");
-            $gustkm = $data->Buffer->$sensortype->$sensorid->gust *3600 /1000;
-            $windkm = $data->Buffer->$sensortype->$sensorid->wind *3600 /1000;
-            SetValue($this->GetIDForIdent("ID"),$data->Buffer->$sensortype->$sensorid->id);
-            SetValue($this->GetIDForIdent("DIRECTION"),$data->Buffer->$sensortype->$sensorid->dir);
-            SetValue($this->GetIDForIdent("GUST"),$data->Buffer->$sensortype->$sensorid->gust);
-            SetValue($this->GetIDForIdent("GUSTKM"),$gustkm);
-            SetValue($this->GetIDForIdent("WIND"),$data->Buffer->$sensortype->$sensorid->wind);
-            SetValue($this->GetIDForIdent("WINDKM"),$windkm);
-            SetValue($this->GetIDForIdent("CHILL"),$data->Buffer->$sensortype->$sensorid->chill);
+            if(array_key_exists("WIND",$data->Buffer)) {
+                $sensortype = $this->ReadPropertyString("sensortype");
+                $sensorid = (string)"wind" . $this->ReadPropertyInteger("sensorid");
+                $gustkm = $data->Buffer->$sensortype->$sensorid->gust * 3600 / 1000;
+                $windkm = $data->Buffer->$sensortype->$sensorid->wind * 3600 / 1000;
+                SetValue($this->GetIDForIdent("ID"), $data->Buffer->$sensortype->$sensorid->id);
+                SetValue($this->GetIDForIdent("DIRECTION"), $data->Buffer->$sensortype->$sensorid->dir);
+                SetValue($this->GetIDForIdent("GUST"), $data->Buffer->$sensortype->$sensorid->gust);
+                SetValue($this->GetIDForIdent("GUSTKM"), $gustkm);
+                SetValue($this->GetIDForIdent("WIND"), $data->Buffer->$sensortype->$sensorid->wind);
+                SetValue($this->GetIDForIdent("WINDKM"), $windkm);
+                SetValue($this->GetIDForIdent("CHILL"), $data->Buffer->$sensortype->$sensorid->chill);
+            }
         }
         elseif($this->ReadPropertyString("sensortype") == "SOL") {
-            $sensortype = $this->ReadPropertyString("sensortype");
-            $sensorid = (string) "sol" .$this->ReadPropertyInteger("sensorid");
-            SetValue($this->GetIDForIdent("ID"),$data->Buffer->$sensortype->$sensorid->id);
-            SetValue($this->GetIDForIdent("RAD"),$data->Buffer->$sensortype->$sensorid->rad);
+            if(array_key_exists("SOL",$data->Buffer)) {
+                $sensortype = $this->ReadPropertyString("sensortype");
+                $sensorid = (string)"sol" . $this->ReadPropertyInteger("sensorid");
+                SetValue($this->GetIDForIdent("ID"), $data->Buffer->$sensortype->$sensorid->id);
+                SetValue($this->GetIDForIdent("RAD"), $data->Buffer->$sensortype->$sensorid->rad);
+            }
         }
     }
     //Remove on next Symcon update
