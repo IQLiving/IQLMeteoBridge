@@ -1,0 +1,18 @@
+{
+  "elements":
+  [
+    { "type": "ValidationTextBox", "name": "ipaddr", "caption": "IP-Adresse" },
+    { "type": "NumberSpinner", "name": "port", "caption": "Port" },
+    { "type": "ValidationTextBox", "name": "username", "caption": "Benutzername" },
+    { "type": "PasswordTextBox", "name": "password", "caption": "Passwort" },
+    { "name": "timerinterval", "type": "IntervalBox", "caption": "Minuten" }
+  ],
+  "status":
+  [
+    { "code": 101, "icon": "active", "caption": "Konfiguration gültig." },
+    { "code": 102, "icon": "active", "caption": "Konfiguration gültig." },
+    { "code": 201, "icon": "error", "caption": "Die IP-Adresse ist ungültig!" },
+    { "code": 202, "icon": "error", "caption": "Der Benutzername ist ungültig!" },
+    { "code": 203, "icon": "error", "caption": "Das Passwort ist ungültig!" }
+  ]
+}

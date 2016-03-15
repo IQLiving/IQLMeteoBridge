@@ -1,0 +1,15 @@
+{
+  "elements":
+  [
+    { "type": "Select", "name": "sensortype", "caption": "Sensortyp",
+      "options": [
+        { "label": "Niederschlag", "value": "RAIN" },
+        { "label": "Temperatur", "value": "TH" },
+        { "label": "Temperatur Basis", "value": "THB" },
+        { "label": "UV-Strahlung", "value": "UV" },
+        { "label": "Wind", "value": "WIND" }
+      ]
+    },
+    { "type": "NumberSpinner", "name": "sensorid", "caption": "Sensorid" }
+  ]
+}

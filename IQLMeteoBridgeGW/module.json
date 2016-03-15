@@ -1,0 +1,14 @@
+{
+  "id": "{B3B1D424-87A5-4F26-93C3-E49BF48873F9}",
+  "name": "IQLMeteoBridgeGW",
+  "type": 2,
+  "vendor": "IQLiving",
+  "aliases":
+  [
+    "IQLMeteoBridgeGW"
+  ],
+  "parentRequirements": [],
+  "childRequirements": ["{5277C676-F57C-4ECE-B9E3-E276D341FBC4}"],
+  "implemented": ["{652C3DD0-1F1A-4EA2-8D0F-78E633660F09}","{B912555E-8802-44A7-A65C-F0968E945299}"],
+  "prefix": "IQLMBGW"
+}
