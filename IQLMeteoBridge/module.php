@@ -14,6 +14,8 @@ class IQLMeteoBridge extends IPSModule {
         //Never delete this line!
         parent::ApplyChanges();
 
+        $this->RegisterProfileInteger("Solar.IQLMB","",""," W/qm",0,0,1);
+
         if($this->ReadPropertyString("sensortype") == "THB") {
             $this->RegisterVariableString("ID","SensorID","~String",0);
             $this->RegisterVariableFloat("TEMPERATURE","Temperatur","~Temperature",0);
@@ -44,6 +46,10 @@ class IQLMeteoBridge extends IPSModule {
             $this->RegisterVariableFloat("GUST","Windgeschwindigkeit", "~WindSpeed.ms",0);
             $this->RegisterVariableFloat("WIND","Durchschnittswindgeschwindigkeit", "~WindSpeed.ms",0);
             $this->RegisterVariableFloat("CHILL","Gefühlte Temperatur", "~Temperature",0);
+        }
+        elseif($this->ReadPropertyString("sensortype") == "SOL") {
+            $this->RegisterVariableString("ID","SensorID","~String",0);
+            $this->RegisterVariableInteger("RAD","Sonnenstrahlung","Solar.IQLMB",0);
         }
 
         $this->ConnectParent("{B3B1D424-87A5-4F26-93C3-E49BF48873F9}");
@@ -92,5 +98,44 @@ class IQLMeteoBridge extends IPSModule {
             SetValue($this->GetIDForIdent("WIND"),$data->Buffer->$sensortype->$sensorid->wind);
             SetValue($this->GetIDForIdent("CHILL"),$data->Buffer->$sensortype->$sensorid->chill);
         }
+        elseif($this->ReadPropertyString("sensortype") == "SOL") {
+            $sensortype = $this->ReadPropertyString("sensortype");
+            $sensorid = (string) "sol" .$this->ReadPropertyInteger("sensorid");
+            SetValue($this->GetIDForIdent("ID"),$data->Buffer->$sensortype->$sensorid->id);
+            SetValue($this->GetIDForIdent("RAD"),$data->Buffer->$sensortype->$sensorid->rad);
+        }
+    }
+    //Remove on next Symcon update
+    protected function RegisterProfileInteger($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $StepSize) {
+
+        if(!IPS_VariableProfileExists($Name)) {
+            IPS_CreateVariableProfile($Name, 1);
+        } else {
+            $profile = IPS_GetVariableProfile($Name);
+            if($profile['ProfileType'] != 1)
+                throw new Exception("Variable profile type does not match for profile ".$Name);
+        }
+
+        IPS_SetVariableProfileIcon($Name, $Icon);
+        IPS_SetVariableProfileText($Name, $Prefix, $Suffix);
+        IPS_SetVariableProfileValues($Name, $MinValue, $MaxValue, $StepSize);
+
+    }
+
+    protected function RegisterProfileIntegerEx($Name, $Icon, $Prefix, $Suffix, $Associations) {
+        if ( sizeof($Associations) === 0 ){
+            $MinValue = 0;
+            $MaxValue = 0;
+        } else {
+            $MinValue = $Associations[0][0];
+            $MaxValue = $Associations[sizeof($Associations)-1][0];
+        }
+
+        $this->RegisterProfileInteger($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, 0);
+
+        foreach($Associations as $Association) {
+            IPS_SetVariableProfileAssociation($Name, $Association[0], $Association[1], $Association[2], $Association[3]);
+        }
+
     }
 }
