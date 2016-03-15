@@ -45,6 +45,8 @@ class IQLMeteoBridge extends IPSModule {
             $this->RegisterVariableInteger("DIRECTION","Windrichtung","~WindDirection",0);
             $this->RegisterVariableFloat("GUST","Windgeschwindigkeit", "~WindSpeed.ms",0);
             $this->RegisterVariableFloat("WIND","Durchschnittswindgeschwindigkeit", "~WindSpeed.ms",0);
+            $this->RegisterVariableFloat("GUSTKM","Windgeschwindigkeit","~WindSpeed.kmh",0);
+            $this->RegisterVariableFloat("WINDKM", "Durchschnittswindgeschwindigkeit","~WindSpeed.kmh",0);
             $this->RegisterVariableFloat("CHILL","Gefühlte Temperatur", "~Temperature",0);
         }
         elseif($this->ReadPropertyString("sensortype") == "SOL") {
@@ -92,10 +94,14 @@ class IQLMeteoBridge extends IPSModule {
         elseif($this->ReadPropertyString("sensortype") == "WIND") {
             $sensortype = $this->ReadPropertyString("sensortype");
             $sensorid = (string) "wind" .$this->ReadPropertyInteger("sensorid");
+            $gustkm = $data->Buffer->$sensortype->$sensorid->gust *3600 /1000;
+            $windkm = $data->Buffer->$sensortype->$sensorid->wind *3600 /1000;
             SetValue($this->GetIDForIdent("ID"),$data->Buffer->$sensortype->$sensorid->id);
             SetValue($this->GetIDForIdent("DIRECTION"),$data->Buffer->$sensortype->$sensorid->dir);
             SetValue($this->GetIDForIdent("GUST"),$data->Buffer->$sensortype->$sensorid->gust);
+            SetValue($this->GetIDForIdent("GUSTKM"),$gustkm);
             SetValue($this->GetIDForIdent("WIND"),$data->Buffer->$sensortype->$sensorid->wind);
+            SetValue($this->GetIDForIdent("WINDKM"),$windkm);
             SetValue($this->GetIDForIdent("CHILL"),$data->Buffer->$sensortype->$sensorid->chill);
         }
         elseif($this->ReadPropertyString("sensortype") == "SOL") {
