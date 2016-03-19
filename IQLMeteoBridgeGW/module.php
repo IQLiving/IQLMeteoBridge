@@ -30,21 +30,26 @@ class IQLMeteoBridgeGW extends IPSModule {
             $this->SetStatus(203);
             return;
         }
-        $this->SetTimerInterval("UpdateTimer",$this->ReadPropertyInteger("timerinterval")*60*1000);
+        $this->SetTimerInterval("UpdateTimer",$this->ReadPropertyInteger("timerinterval")*1000);
     }
 
     public function Update() {
-        $url = 'http://' .$this->ReadPropertyString("username") .':' .$this->ReadPropertyString("password") .'@' .$this->ReadPropertyString("ipaddr") .':' .$this->ReadPropertyInteger("port") .'/cgi-bin/livedataxml.cgi';
-        $xmlResult = new SimpleXMLElement(file_get_contents($url));
-        $export = array();
-        foreach($xmlResult as $key => $entry) {
-            $elementid = (string) $entry['id'];
-            $array = (array) $entry;
-            foreach($array as $newentry) {
-                $export[$key][$elementid] = $newentry;
-            }
+        if (IPS_SemaphoreEnter("IQLMeteoBridgeGW", 1000)) {
+            $url = 'http://' . $this->ReadPropertyString("username") . ':' . $this->ReadPropertyString("password") . '@' . $this->ReadPropertyString("ipaddr") . ':' . $this->ReadPropertyInteger("port") . '/cgi-bin/livedataxml.cgi';
+            $xmlResult = new SimpleXMLElement(file_get_contents($url));
+            IPS_SemaphoreLeave("IQLMeteoBridgeGW");
         }
-        $jsonexport = json_encode(Array("DataID" => "{5277C676-F57C-4ECE-B9E3-E276D341FBC4}", "Buffer" => $export));
-        $this->SendDataToChildren($jsonexport);
+        if(isset($xmlResult)) {
+            $export = array();
+            foreach ($xmlResult as $key => $entry) {
+                $elementid = (string)$entry['id'];
+                $array = (array)$entry;
+                foreach ($array as $newentry) {
+                    $export[$key][$elementid] = $newentry;
+                }
+            }
+            $jsonexport = json_encode(Array("DataID" => "{5277C676-F57C-4ECE-B9E3-E276D341FBC4}", "Buffer" => $export));
+            $this->SendDataToChildren($jsonexport);
+        }
     }
 }

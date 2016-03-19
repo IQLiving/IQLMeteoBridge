@@ -5,7 +5,7 @@
     { "type": "NumberSpinner", "name": "port", "caption": "Port" },
     { "type": "ValidationTextBox", "name": "username", "caption": "Benutzername" },
     { "type": "PasswordTextBox", "name": "password", "caption": "Passwort" },
-    { "name": "timerinterval", "type": "IntervalBox", "caption": "Minuten" }
+    { "name": "timerinterval", "type": "IntervalBox", "caption": "Sekunden" }
   ],
   "status":
   [
