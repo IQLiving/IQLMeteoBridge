@@ -3,6 +3,8 @@
   [
     { "type": "Select", "name": "sensortype", "caption": "Sensortyp",
       "options": [
+        { "label": "Blattfeuchte", "value": "LEAF" },
+        { "label": "Bodenfeuchte", "value": "SOIL" },
         { "label": "Niederschlag", "value": "RAIN" },
         { "label": "Sonnenstrahlung", "value": "SOL" },
         { "label": "Temperatur", "value": "TH" },

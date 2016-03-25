@@ -33,6 +33,7 @@ class IQLMeteoBridge extends IPSModule {
             Array(315, "NW",  "",-1),
             Array(338, "NNW",  "",-1)
         ));
+        $this->RegisterProfileInteger("Bodenfeuchte.IQLMB","",""," cb",0,200,1);
         if($this->ReadPropertyString("sensortype") == "THB") {
             $this->RegisterVariableString("ID","SensorID","~String",0);
             $this->RegisterVariableFloat("TEMPERATURE","Temperatur","~Temperature",0);
@@ -40,22 +41,26 @@ class IQLMeteoBridge extends IPSModule {
             $this->RegisterVariableFloat("DEWPOINT","Taupunkt","~Temperature",0);
             $this->RegisterVariableFloat("PRESS","Luftdruck","~AirPressure.F",0);
             $this->RegisterVariableFloat("SEAPRESS","Luftdruck Normalnull","~AirPressure.F",0);
+            $this->RegisterVariableBoolean("LOWBAT", "Batterie","~Alert",0);
         }
         elseif($this->ReadPropertyString("sensortype") == "RAIN") {
             $this->RegisterVariableString("ID","SensorID","~String",0);
             $this->RegisterVariableFloat("RAIN","Niederschlag pro Stunde","~Rainfall",0);
             $this->RegisterVariableFloat("TOTAL","Niederschlag Gesamt","~Rainfall",0);
             $this->RegisterVariableFloat("DELTA","Delta","~Rainfall",0);
+            $this->RegisterVariableBoolean("LOWBAT", "Batterie","~Alert",0);
         }
         elseif($this->ReadPropertyString("sensortype") == "UV") {
             $this->RegisterVariableString("ID","SensorID","~String",0);
             $this->RegisterVariableFloat("INDEX", "UV-Index", "",0);
+            $this->RegisterVariableBoolean("LOWBAT", "Batterie","~Alert",0);
         }
         elseif($this->ReadPropertyString("sensortype") == "TH") {
             $this->RegisterVariableString("ID","SensorID","~String",0);
             $this->RegisterVariableFloat("TEMPERATURE","Temperatur","~Temperature",0);
             $this->RegisterVariableInteger("HUMIDITY","Luftfeuchtigkeit","~Humidity",0);
             $this->RegisterVariableFloat("DEWPOINT","Taupunkt","~Temperature",0);
+            $this->RegisterVariableBoolean("LOWBAT", "Batterie","~Alert",0);
         }
         elseif($this->ReadPropertyString("sensortype") == "WIND") {
             $this->RegisterVariableString("ID","SensorID","~String",0);
@@ -65,10 +70,22 @@ class IQLMeteoBridge extends IPSModule {
             $this->RegisterVariableFloat("GUSTKM","Windgeschwindigkeit","~WindSpeed.kmh",0);
             $this->RegisterVariableFloat("WINDKM", "Durchschnittswindgeschwindigkeit","~WindSpeed.kmh",0);
             $this->RegisterVariableFloat("CHILL","Gefühlte Temperatur", "~Temperature",0);
+            $this->RegisterVariableBoolean("LOWBAT", "Batterie","~Alert",0);
         }
         elseif($this->ReadPropertyString("sensortype") == "SOL") {
             $this->RegisterVariableString("ID","SensorID","~String",0);
             $this->RegisterVariableInteger("RAD","Sonnenstrahlung","Solar.IQLMB",0);
+            $this->RegisterVariableBoolean("LOWBAT", "Batterie","~Alert",0);
+        }
+        elseif($this->ReadPropertyString("sensortype") == "LEAF") {
+            $this->RegisterVariableBoolean("LOWBAT", "Batterie","~Alert",0);
+            $this->RegisterVariableFloat("TEMPERATURE","Temperatur","~Temperature",0);
+            $this->RegisterVariableInteger("HUMIDITY","Blattfeuchte","",0);
+        }
+        elseif($this->ReadPropertyString("sensortype") == "SOIL") {
+            $this->RegisterVariableBoolean("LOWBAT", "Batterie","~Alert",0);
+            $this->RegisterVariableFloat("TEMPERATURE","Temperatur","~Temperature",0);
+            $this->RegisterVariableInteger("HUMIDITY","Bodenfeute","Bodenfeuchte.IQLMB",0);
         }
 
         $this->ConnectParent("{B3B1D424-87A5-4F26-93C3-E49BF48873F9}");
@@ -86,6 +103,8 @@ class IQLMeteoBridge extends IPSModule {
                 SetValue($this->GetIDForIdent("DEWPOINT"), $data->Buffer->$sensortype->$sensorid->dew);
                 SetValue($this->GetIDForIdent("PRESS"), $data->Buffer->$sensortype->$sensorid->press);
                 SetValue($this->GetIDForIdent("SEAPRESS"), $data->Buffer->$sensortype->$sensorid->seapress);
+                $lowbat = (bool) $data->Buffer->$sensortype->$sensorid->lowbat;
+                SetValue($this->GetIDForIdent("LOWBAT"),$lowbat);
             }
         }
         elseif($this->ReadPropertyString("sensortype") == "RAIN") {
@@ -96,6 +115,8 @@ class IQLMeteoBridge extends IPSModule {
                 SetValue($this->GetIDForIdent("RAIN"), $data->Buffer->$sensortype->$sensorid->rate);
                 SetValue($this->GetIDForIdent("TOTAL"), $data->Buffer->$sensortype->$sensorid->total);
                 SetValue($this->GetIDForIdent("DELTA"), $data->Buffer->$sensortype->$sensorid->delta);
+                $lowbat = (bool) $data->Buffer->$sensortype->$sensorid->lowbat;
+                SetValue($this->GetIDForIdent("LOWBAT"),$lowbat);
             }
         }
         elseif($this->ReadPropertyString("sensortype") == "UV") {
@@ -104,6 +125,8 @@ class IQLMeteoBridge extends IPSModule {
                 $sensorid = (string)"uv" . $this->ReadPropertyInteger("sensorid");
                 SetValue($this->GetIDForIdent("ID"), $data->Buffer->$sensortype->$sensorid->id);
                 SetValue($this->GetIDForIdent("INDEX"), $data->Buffer->$sensortype->$sensorid->index);
+                $lowbat = (bool) $data->Buffer->$sensortype->$sensorid->lowbat;
+                SetValue($this->GetIDForIdent("LOWBAT"),$lowbat);
             }
         }
         elseif($this->ReadPropertyString("sensortype") == "TH") {
@@ -114,6 +137,8 @@ class IQLMeteoBridge extends IPSModule {
                 SetValue($this->GetIDForIdent("TEMPERATURE"), $data->Buffer->$sensortype->$sensorid->temp);
                 SetValue($this->GetIDForIdent("HUMIDITY"), $data->Buffer->$sensortype->$sensorid->hum);
                 SetValue($this->GetIDForIdent("DEWPOINT"), $data->Buffer->$sensortype->$sensorid->dew);
+                $lowbat = (bool) $data->Buffer->$sensortype->$sensorid->lowbat;
+                SetValue($this->GetIDForIdent("LOWBAT"),$lowbat);
             }
         }
         elseif($this->ReadPropertyString("sensortype") == "WIND") {
@@ -129,6 +154,8 @@ class IQLMeteoBridge extends IPSModule {
                 SetValue($this->GetIDForIdent("WIND"), $data->Buffer->$sensortype->$sensorid->wind);
                 SetValue($this->GetIDForIdent("WINDKM"), $windkm);
                 SetValue($this->GetIDForIdent("CHILL"), $data->Buffer->$sensortype->$sensorid->chill);
+                $lowbat = (bool) $data->Buffer->$sensortype->$sensorid->lowbat;
+                SetValue($this->GetIDForIdent("LOWBAT"),$lowbat);
             }
         }
         elseif($this->ReadPropertyString("sensortype") == "SOL") {
@@ -137,6 +164,28 @@ class IQLMeteoBridge extends IPSModule {
                 $sensorid = (string)"sol" . $this->ReadPropertyInteger("sensorid");
                 SetValue($this->GetIDForIdent("ID"), $data->Buffer->$sensortype->$sensorid->id);
                 SetValue($this->GetIDForIdent("RAD"), $data->Buffer->$sensortype->$sensorid->rad);
+                $lowbat = (bool) $data->Buffer->$sensortype->$sensorid->lowbat;
+                SetValue($this->GetIDForIdent("LOWBAT"),$lowbat);
+            }
+        }
+        elseif($this->ReadPropertyString("sensortype") == "LEAF") {
+            if(array_key_exists("LEAF",$data->Buffer)) {
+                $sensortype = $this->ReadPropertyString("sensortype");
+                $sensorid = (string)"th" . $this->ReadPropertyInteger("sensorid");
+                $lowbat = (bool) $data->Buffer->$sensortype->$sensorid->lowbat;
+                SetValue($this->GetIDForIdent("LOWBAT"),$lowbat);
+                SetValue($this->GetIDForIdent("TEMPERATURE"), $data->Buffer->$sensortype->$sensorid->temp);
+                SetValue($this->GetIDForIdent("HUMIDITY"), $data->Buffer->$sensortype->$sensorid->hum);
+            }
+        }
+        elseif($this->ReadPropertyString("sensortype") =="SOIL") {
+            if(array_key_exists("SOIL",$data->Buffer)) {
+                $sensortype = $this->ReadPropertyString("sensortype");
+                $sensorid = (string)"th" . $this->ReadPropertyInteger("sensorid");
+                $lowbat = (bool) $data->Buffer->$sensortype->$sensorid->lowbat;
+                SetValue($this->GetIDForIdent("LOWBAT"),$lowbat);
+                SetValue($this->GetIDForIdent("TEMPERATURE"), $data->Buffer->$sensortype->$sensorid->temp);
+                SetValue($this->GetIDForIdent("HUMIDITY"), $data->Buffer->$sensortype->$sensorid->hum);
             }
         }
     }
